@@ -72,7 +72,7 @@ def home():
             <input type="text" id="nome" placeholder="Seu Nome" required>
             <input type="number" id="quantidade" placeholder="Quantidade de Garrafões" required oninput="calcularTotal()">
             <input type="text" id="endereco" placeholder="Seu Endereço" required>
-            <input type="text" id="validade" placeholder="Validade do Garrafão" required>
+            <input type="text" id="validade" placeholder="Validade do Garrafão (opcional)">
 
             <div class="total" id="total">Total: R$ 0,00</div>
 
@@ -106,7 +106,7 @@ def home():
                 return;
             }
 
-            var mensagem = "Olá segue abaixo o meu pedido! 💧%0A" +
+            var mensagem = "Olá Segue abaixo o meu pedido! 💧%0A" +
                            "Nome: " + nome + "%0A" +
                            "Quantidade: " + quantidade + " garrafões%0A" +
                            "Total: R$ " + total.toFixed(2).replace(".", ",") + "%0A" +
