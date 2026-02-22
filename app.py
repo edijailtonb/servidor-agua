@@ -1,112 +1,106 @@
-from flask import Flask, request, jsonify, render_template_string
-from flask_cors import CORS
-import json
-import os
+from flask import Flask
 
 app = Flask(__name__)
-CORS(app)
-
-ARQUIVO = "pedidos.json"
-
-def carregar():
-    if not os.path.exists(ARQUIVO):
-        return []
-    with open(ARQUIVO, "r", encoding="utf-8") as f:
-        return json.load(f)
-
-def salvar(dados):
-    with open(ARQUIVO, "w", encoding="utf-8") as f:
-        json.dump(dados, f, indent=4, ensure_ascii=False)
-
-HTML = """
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Distribuidora Água</title>
-<style>
-body {
-    font-family: Arial;
-    background: #0d6efd;
-    margin: 0;
-    padding: 20px;
-    color: white;
-    text-align: center;
-}
-.container {
-    background: white;
-    color: black;
-    padding: 20px;
-    border-radius: 12px;
-    max-width: 400px;
-    margin: auto;
-}
-input, textarea {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-}
-button {
-    width: 100%;
-    padding: 12px;
-    background: #0d6efd;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-}
-</style>
-</head>
-<body>
-<h2>💧 Peça sua Água</h2>
-<div class="container">
-<input id="cliente" placeholder="Seu nome">
-<input id="telefone" placeholder="Telefone">
-<input id="endereco" placeholder="Endereço">
-<input id="quantidade" type="number" placeholder="Quantidade">
-<textarea id="obs" placeholder="Observação"></textarea>
-<button onclick="enviar()">PEDIR AGORA</button>
-<p id="msg"></p>
-</div>
-
-<script>
-function enviar() {
-    fetch('/pedido', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            cliente: document.getElementById('cliente').value,
-            telefone: document.getElementById('telefone').value,
-            endereco: document.getElementById('endereco').value,
-            quantidade: document.getElementById('quantidade').value,
-            obs: document.getElementById('obs').value,
-            entregue: false
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        document.getElementById('msg').innerHTML = "✅ Pedido enviado com sucesso!";
-    });
-}
-</script>
-</body>
-</html>
-"""
 
 @app.route("/")
 def home():
-    return render_template_string(HTML)
+    return """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Distribuidora Mari Água & Gás</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                background: linear-gradient(135deg, #007BFF, #00C6FF);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100vh;
+                margin: 0;
+            }
+            .container {
+                background: white;
+                padding: 30px;
+                border-radius: 15px;
+                width: 90%;
+                max-width: 400px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                text-align: center;
+            }
+            h2 {
+                color: #007BFF;
+                margin-bottom: 20px;
+            }
+            input {
+                width: 100%;
+                padding: 12px;
+                margin: 8px 0;
+                border-radius: 8px;
+                border: 1px solid #ccc;
+                font-size: 14px;
+            }
+            button {
+                width: 100%;
+                padding: 14px;
+                margin-top: 15px;
+                border: none;
+                border-radius: 8px;
+                background-color: #25D366;
+                color: white;
+                font-size: 16px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+            button:hover {
+                background-color: #1ebe5d;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>💧 Peça sua Água Agora</h2>
 
-@app.route("/pedido", methods=["POST"])
-def novo_pedido():
-    dados = request.json
-    pedidos = carregar()
-    pedidos.append(dados)
-    salvar(pedidos)
-    return jsonify({"status": "Pedido recebido com sucesso!"})
+            <input type="text" id="nome" placeholder="Seu Nome" required>
+            <input type="number" id="quantidade" placeholder="Quantidade de Garrafões" required>
+            <input type="text" id="endereco" placeholder="Seu Endereço" required>
+            <input type="text" id="validade" placeholder="Validade do Garrafão (opcional)">
 
-@app.route("/pedidos", methods=["GET"])
-def listar():
-    return jsonify(carregar())
+            <button onclick="enviarWhatsApp()">Enviar Pedido no WhatsApp</button>
+        </div>
+
+        <script>
+        function enviarWhatsApp() {
+            var nome = document.getElementById("nome").value;
+            var quantidade = document.getElementById("quantidade").value;
+            var endereco = document.getElementById("endereco").value;
+            var validade = document.getElementById("validade").value;
+
+            if(nome === "" || quantidade === "" || endereco === ""){
+                alert("Preencha os campos obrigatórios!");
+                return;
+            }
+
+            var mensagem = "Olá Mari! 💧%0A" +
+                           "Nome: " + nome + "%0A" +
+                           "Quantidade: " + quantidade + " garrafões%0A" +
+                           "Endereço: " + endereco;
+
+            if(validade !== ""){
+                mensagem += "%0AValidade do Garrafão: " + validade;
+            }
+
+            var numero = "5581991488686";
+            var url = "https://wa.me/" + numero + "?text=" + mensagem;
+
+            window.open(url, "_blank");
+        }
+        </script>
+    </body>
+    </html>
+    """
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=10000)
