@@ -42,6 +42,12 @@ def home():
                 border: 1px solid #ccc;
                 font-size: 14px;
             }
+            .total {
+                margin-top: 10px;
+                font-weight: bold;
+                font-size: 18px;
+                color: #007BFF;
+            }
             button {
                 width: 100%;
                 padding: 14px;
@@ -64,28 +70,46 @@ def home():
             <h2>💧 Peça sua Água Agora</h2>
 
             <input type="text" id="nome" placeholder="Seu Nome" required>
-            <input type="number" id="quantidade" placeholder="Quantidade de Garrafões" required>
+            <input type="number" id="quantidade" placeholder="Quantidade de Garrafões" required oninput="calcularTotal()">
             <input type="text" id="endereco" placeholder="Seu Endereço" required>
-            <input type="text" id="validade" placeholder="Validade do Garrafão (opcional)">
+            <input type="text" id="validade" placeholder="Validade do Garrafão" required>
+
+            <div class="total" id="total">Total: R$ 0,00</div>
 
             <button onclick="enviarWhatsApp()">Enviar Pedido no WhatsApp</button>
         </div>
 
         <script>
+        function calcularTotal() {
+            var quantidade = document.getElementById("quantidade").value;
+            var preco = 7.00;
+            var total = quantidade * preco;
+
+            if (!quantidade || quantidade <= 0) {
+                total = 0;
+            }
+
+            document.getElementById("total").innerHTML = 
+                "Total: R$ " + total.toFixed(2).replace(".", ",");
+        }
+
         function enviarWhatsApp() {
             var nome = document.getElementById("nome").value;
             var quantidade = document.getElementById("quantidade").value;
             var endereco = document.getElementById("endereco").value;
             var validade = document.getElementById("validade").value;
+            var preco = 7.00;
+            var total = quantidade * preco;
 
             if(nome === "" || quantidade === "" || endereco === ""){
                 alert("Preencha os campos obrigatórios!");
                 return;
             }
 
-            var mensagem = "Olá Mari! 💧%0A" +
+            var mensagem = "Olá segue abaixo o meu pedido! 💧%0A" +
                            "Nome: " + nome + "%0A" +
                            "Quantidade: " + quantidade + " garrafões%0A" +
+                           "Total: R$ " + total.toFixed(2).replace(".", ",") + "%0A" +
                            "Endereço: " + endereco;
 
             if(validade !== ""){
