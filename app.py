@@ -110,6 +110,3 @@ def novo_pedido():
 @app.route("/pedidos", methods=["GET"])
 def listar():
     return jsonify(carregar())
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
